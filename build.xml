@@ -1,0 +1,90 @@
+<project name="HoleFillingRunner" basedir="." default="rebuild-run">
+
+    <property name="src.dir"     value="src"/>
+
+    <property name="lib.dir"     value="C:\opencv\build\java"/>
+    <path id="classpath">
+        <fileset dir="${lib.dir}" includes="**/*.jar"/>
+    </path>
+
+    <property name="build.dir"   value="build"/>
+    <property name="classes.dir" value="${build.dir}/classes"/>
+    <property name="jar.dir"     value="${build.dir}/jar"/>
+
+    <property name="main-class"  value="${ant.project.name}"/>
+
+    <condition property="imgpath" value="[default]">
+        <not>
+            <isset property="imgpath"/>
+        </not>
+    </condition>
+
+    <condition property="alg" value="[default]">
+        <not>
+            <isset property="alg"/>
+        </not>
+    </condition>
+
+    <condition property="z" value="[default]">
+        <not>
+            <isset property="z"/>
+        </not>
+    </condition>
+
+    <condition property="eps" value="[default]">
+        <not>
+            <isset property="eps"/>
+        </not>
+    </condition>
+
+    <condition property="test" value="[default]">
+        <not>
+            <isset property="test"/>
+        </not>
+    </condition>
+
+    <condition property="mockhole" value="[default]">
+        <not>
+            <isset property="mockhole"/>
+        </not>
+    </condition>
+
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+    </target>
+
+    <target name="compile">
+        <mkdir dir="${classes.dir}"/>
+        <javac includeantruntime="false" srcdir="${src.dir}" destdir="${classes.dir}" classpathref="classpath"/>
+    </target>
+
+    <target name="jar" depends="compile">
+        <mkdir dir="${jar.dir}"/>
+        <jar destfile="${jar.dir}/${ant.project.name}.jar" basedir="${classes.dir}">
+            <manifest>
+                <attribute name="Main-Class" value="${main-class}"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="run" depends="jar">
+        <java fork="true" classname="${main-class}">
+            <sysproperty key="java.library.path" path="C:\opencv\build\java\x64"/>
+            <classpath>
+                <path refid="classpath"/>
+                <path location="${jar.dir}/${ant.project.name}.jar"/>
+            </classpath>
+        <arg value="${imgpath}"/>
+            <arg value="${alg}"/>
+        <arg value="${z}"/>
+        <arg value="${eps}"/>
+        <arg value="${test}"/>
+        <arg value="${mockhole}"/>
+        </java>
+    </target>
+
+    <target name="rebuild" depends="clean,jar"/>
+
+    <target name="rebuild-run" depends="clean,run"/>
+
+</project>
